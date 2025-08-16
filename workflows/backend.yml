@@ -1,0 +1,31 @@
+name: backend-cicd
+on:
+  push:
+    paths: ["backend/**", ".github/workflows/backend.yml"]
+    branches: ["main"]
+
+jobs:
+  docker-build-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          tags: mindtube-backend:ci
+
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: mindtube-backend:ci
+          format: table
+          exit-code: 0
+
+  # Add AWS auth + ECR push + ECS deploy job when infra is ready

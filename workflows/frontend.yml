@@ -1,0 +1,22 @@
+name: frontend-ci
+on:
+  push:
+    paths: ["frontend/**", ".github/workflows/frontend.yml"]
+    branches: ["main"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+      # Optionally: deploy via Vercel CLI using a token in secrets
+      # - name: Vercel Deploy
+      #   run: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes

@@ -1,0 +1,27 @@
+name: infra-plan-apply
+on:
+  push:
+    paths: ["infra/**", ".github/workflows/infra.yml"]
+    branches: ["main"]
+  pull_request:
+    paths: ["infra/**"]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.5
+        with:
+          working_directory: infra/terraform
+
+      - name: Terraform Init
+        working-directory: infra/terraform
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        working-directory: infra/terraform
+        run: terraform plan -input=false
